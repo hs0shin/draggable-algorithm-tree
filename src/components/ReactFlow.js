@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactFlow, { removeElements, addEdge } from 'react-flow-renderer';
-const onLoad = (reactFlowInstance) => reactFlowInstance.fitView();
+const onLoad = (reactFlowInstance) => {reactFlowInstance.fitView(); console.log(reactFlowInstance)}
 const onNodeMouseEnter = (event, node) => console.log('mouse enter:', node);
 const onNodeMouseMove = (event, node) => console.log('mouse move:', node);
 const onNodeMouseLeave = (event, node) => console.log('mouse leave:', node);

@@ -2,6 +2,7 @@ import './App.css';
 import Test from './components/ReactFlow';
 import React from 'react';
 import styled from 'styled-components';
+import SideBar from './components/SideBar';
 
 const Wrapper = styled.div`
   display: flex;
@@ -11,15 +12,18 @@ const Wrapper = styled.div`
 
 const LeftDiv = styled.div`
   height: 100%;
-  flex: 1 0 0px;
+  flex: 1 0 0rem;
   background-color: rgb(250,250,250);
 `;
 
 const RightDiv = styled.div`
   height: 100%;
-  flex: 0 0 30rem;
+  flex: 0 0 ${props => props.flexBasis};
   overflow: auto;
   background-color: rgb(240,240,240);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   
   &::-webkit-scrollbar { 
     display: none;
@@ -32,14 +36,19 @@ function App() {
       <LeftDiv>
         <Test initialElements={initialElements}></Test>
       </LeftDiv>
-      <RightDiv>
-
+      <RightDiv flexBasis={'20%'}>
+        <SideBar rightObj={rightObj} />
       </RightDiv>
     </Wrapper>
   );
 }
 export default App;
 
+const rightObj = [
+  { id: '1' },
+  { id: '2' },
+  { id: '3' },
+]
 
 const initialElements = [
   {
@@ -47,7 +56,7 @@ const initialElements = [
     sourcePosition: 'right',
     type: 'input',
     className: 'dark-node',
-    data: { label: 'Input' }, 
+    data: { label: 'Input' },
     position: { x: 0, y: 80 },
   },
   {
