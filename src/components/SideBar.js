@@ -15,11 +15,11 @@ const BoxDiv = styled.div`
     cursor: grab;
 `;
 
-export default function SideBar({ rightObj }) {
+export default function SideBar({ rightObj, handleDragEnd }) {
     return <>
         {rightObj.map(val => <BoxDiv
             draggable
-            onDragEnd={(e) => console.log(e)}
+            onDragEnd={handleDragEnd(val)}
         >{val.id}</BoxDiv>)}
     </>
 }
