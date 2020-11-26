@@ -15,11 +15,47 @@ const BoxDiv = styled.div`
     cursor: grab;
 `;
 
+const LabelDiv = styled.div`
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    overflow: hidden;
+    padding: 0.5rem 0 0.5rem 0;
+    `;
+
+const ContainerDiv = styled.div`  
+    width: 100%;
+    height: calc(50% - 2rem);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0 0.5rem 0;
+
+    &::-webkit-scrollbar { 
+      display: none;
+    }
+
+`;
+
 export default function SideBar({ rightObj, handleDragEnd }) {
     return <>
-        {rightObj.map(val => <BoxDiv
-            draggable
-            onDragEnd={handleDragEnd(val)}
-        >{val.id}</BoxDiv>)}
+        <LabelDiv>Intent</LabelDiv>
+        <ContainerDiv>
+            {rightObj.filter(val => val.type === 'input').map(val => <BoxDiv
+                draggable
+                onDragEnd={handleDragEnd(val)}
+            >{val.id}</BoxDiv>)}
+        </ContainerDiv>
+        <LabelDiv>Action</LabelDiv>
+        <ContainerDiv>
+            {rightObj.filter(val => val.type === 'output').map(val => <BoxDiv
+                draggable
+                onDragEnd={handleDragEnd(val)}
+            >{val.id}</BoxDiv>)}
+        </ContainerDiv>
     </>
 }

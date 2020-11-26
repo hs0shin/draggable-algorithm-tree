@@ -22,15 +22,9 @@ const LeftDiv = styled.div`
 const RightDiv = styled.div`
   height: 100%;
   width: ${props => props.editable ? '20%' : 0};
-  overflow: auto;
   background-color: rgb(240,240,240);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  
-  &::-webkit-scrollbar { 
-    display: none;
-  }
 `;
 
 const Toolbar = styled.div`
@@ -116,14 +110,42 @@ const rightObj = [
     type: 'input',
     className: 'dark-node',
     data: { label: 'Input' },
+  },
+  {
+    id: 'sub_1',
+    sourcePosition: 'right',
+    type: 'input',
+    className: 'dark-node',
+    data: { label: 'Input' },
+  },
+  {
+    id: 'sub_2',
+    sourcePosition: 'right',
+    type: 'output',
+    className: 'dark-node',
+    data: { label: 'Input' },
+  },
+  {
+    id: 'sub_3',
+    sourcePosition: 'right',
+    type: 'output',
+    className: 'dark-node',
+    data: { label: 'Input' },
   }
 ]
 const initialElements = [
   {
+    id: 'horizontal-e1-2',
+    source: '1',
+    type: 'smoothstep',
+    target: '2',
+    animated: true,
+  },
+  {
     id: '1',
     type: 'input',
     className: 'dark-node',
-    data: { label: 'start_intent' },
+    data: { label: 'start_intetn' },
     position: { x: 0, y: 80 },
     style: {
       background: 'rgb(225,225,255)',
