@@ -5,8 +5,36 @@ export const nodeConfig = {
         link: {},
     },
     type: {
-        action: {},
-        intent: {},
+        action: {
+            style: {
+                color: '#ff0072',
+                border: '1px solid #ff0072',
+            }
+        },
+        intent: {
+            style: {
+                color: '#0041d0',
+                border: '1px solid #0041d0',
+            }
+        },
+        start: {
+            style: {
+                background: 'rgb(225,225,255)',
+                color: '#0041d0',
+            }
+        },
+        end: {
+            style: {
+                background: 'rgb(255,225,225)',
+                color: '#ff0072',
+            }
+        },
+        error: {
+            style: {
+                background: 'RGB(123,33,41)',
+            },
+            data: { label: 'Error! Invalid node information' },
+        },
     }
 }
 
