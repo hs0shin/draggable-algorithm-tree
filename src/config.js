@@ -4,26 +4,32 @@ export const nodeConfig = {
         end: {},
         link: {},
     },
-    type: {
+    node: {
         action: {
+            category:'action',
             style: {
                 color: '#ff0072',
                 border: '1px solid #ff0072',
             }
         },
         intent: {
+            category:'intent',
             style: {
                 color: '#0041d0',
                 border: '1px solid #0041d0',
             }
         },
         start: {
+            type: 'input',
+            category:'start',
             style: {
                 background: 'rgb(225,225,255)',
                 color: '#0041d0',
             }
         },
         end: {
+            type: 'output',
+            category:'end',
             style: {
                 background: 'rgb(255,225,225)',
                 color: '#ff0072',
@@ -35,6 +41,25 @@ export const nodeConfig = {
             },
             data: { label: 'Error! Invalid node information' },
         },
+    },
+    edge: {
+        action:{
+            type: 'smoothstep',
+            animated: true
+        },
+        intent:{
+            type: 'smoothstep',
+            animated: true
+        },
+        start:{
+            type: 'smoothstep',
+            animated: true
+        },
+        end:{
+            type: 'smoothstep',
+            animated: true
+        },
+        error:{},
     }
 }
 

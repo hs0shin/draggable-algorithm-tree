@@ -144,6 +144,7 @@ const initialElements = [
   {
     id: '1',
     type: 'input',
+    category:'start',
     className: 'dark-node',
     data: { label: 'start_intetn' },
     position: { x: 0, y: 80 },
@@ -155,6 +156,7 @@ const initialElements = [
   {
     id: '2',
     className: 'dark-node',
+    category:'intent',
     data: { label: 'Intent' },
     position: { x: 0, y: 180 },
     style: {
@@ -164,6 +166,7 @@ const initialElements = [
   },
   {
     id: '3',
+    category:'action',
     className: 'dark-node',
     data: { label: 'Action' },
     position: { x: 0, y: 280 },
@@ -175,6 +178,7 @@ const initialElements = [
   {
     id: '4',
     type: 'output',
+    category:'end',
     className: 'dark-node',
     data: { label: 'end_action' },
     position: { x: 0, y: 380 },
