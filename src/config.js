@@ -45,18 +45,25 @@ export const nodeConfig = {
     edge: {
         action:{
             type: 'smoothstep',
-            animated: true
+            label: 'Condition',
+            animated: true,
+            style: {
+                backgroundColor: 'rgb(0,0,0)'
+            }
         },
         intent:{
             type: 'smoothstep',
+            label: 'Condition',
             animated: true
         },
         start:{
             type: 'smoothstep',
+            label: 'Condition',
             animated: true
         },
         end:{
             type: 'smoothstep',
+            label: 'Condition',
             animated: true
         },
         error:{},
@@ -75,6 +82,8 @@ export const scenarioData = {
             "type": 0,
             "intent_id": 3,
             "action_id": null,
+            "x_coordinate": 0,
+            "y_coordinate": 0,
             "next_steps": [
                 {
                     "step_id": 1,
@@ -90,6 +99,8 @@ export const scenarioData = {
             "type": 1,
             "intent_id": null,
             "action_id": 3,
+            "x_coordinate": 0,
+            "y_coordinate": 100,
             "next_steps": []
         }
     ]

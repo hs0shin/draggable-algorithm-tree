@@ -10,7 +10,7 @@ export const flowArrFactory = (intentArr, actionArr) => (data = []) => {
             case 2: setStartObj(result, intentArr, stepObj); break;
             case 3: setEndObj(result, actionArr, stepObj); break;
             default: throw Error(`Invalid step type: ${stepObj.type}`);
-        } break;
+        }
     }
     return result;
 }
@@ -20,7 +20,7 @@ const setIntentObj = (result, intentArr, stepObj) => {
     const node = {
         ...nodeConfig.node.intent,
         id: `node_${stepObj.id}`,
-        data: { label: intentObj.name, description: intentObj.description },
+        data: { label: intentObj.name, description: intentObj.description, intent_id: stepObj.intent_id },
         position: { x: stepObj.x_coordinate, y: stepObj.y_coordinate }
     }
     result.push(node);
@@ -41,7 +41,7 @@ const setStartObj = (result, intentArr, stepObj) => {
     const node = {
         ...nodeConfig.node.start,
         id: `node_${stepObj.id}`,
-        data: { label: intentObj.name, description: intentObj.description },
+        data: { label: intentObj.name, description: intentObj.description, intent_id: stepObj.intent_id },
         position: { x: stepObj.x_coordinate, y: stepObj.y_coordinate }
     }
     result.push(node);
@@ -61,8 +61,8 @@ const setActionObj = (result, actionArr, stepObj) => {
     const actionObj = actionArr.find(action => action.id === stepObj.action_id) || nodeConfig.node.error;
     const node = {
         ...nodeConfig.node.action,
-        id: stepObj.id,
-        data: { label: actionObj.name, description: actionObj.description },
+        id: `node_${stepObj.id}`,
+        data: { label: actionObj.name, description: actionObj.description, action_id: stepObj.action_id },
         position: { x: stepObj.x_coordinate, y: stepObj.y_coordinate },
     }
     result.push(node);
@@ -82,15 +82,27 @@ const setEndObj = (result, actionArr, stepObj) => {
     const actionObj = actionArr.find(action => action.id === stepObj.action_id) || nodeConfig.node.error;
     const node = {
         ...nodeConfig.node.end,
-        id: stepObj.id,
-        data: { label: actionObj.name, description: actionObj.description },
+        id: `node_${stepObj.id}`,
+        data: { label: actionObj.name, description: actionObj.description, action_id: stepObj.action_id },
         position: { x: stepObj.x_coordinate, y: stepObj.y_coordinate },
         type: 'output'
     }
     result.push(node);
 };
 
+export const setSideIntentArr = intentArr => {
+    return intentArr.map(intentObj => ({
+        ...nodeConfig.node.intent,
+        data: { label: intentObj.name, description: intentObj.description, intent_id: intentObj.id },
+    }))
+};
 
+export const setSideActionArr = actionArr => {
+    return actionArr.map(actionObj => ({
+        ...nodeConfig.node.action,
+        data: { label: actionObj.name, description: actionObj.description, action_id: actionObj.id },
+    }))
+};
 
 let action = {
     "id": 1,

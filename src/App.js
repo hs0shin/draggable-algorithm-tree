@@ -1,11 +1,17 @@
 import './App.css';
-import Test from './components/ReactFlow';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SideBar from './components/SideBar';
 import Switch from '@material-ui/core/Switch';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+
+import { actionData, intentData, scenarioData } from './config';
+import { flowArrFactory } from './scenario';
+import ReactFlow, { addEdge, Background, removeElements, isEdge, getConnectedEdges } from 'react-flow-renderer';
+import NodeMenu from './components/NodeMenu';
+import { nodeConfig } from './config';
+import _ from 'lodash-uuid';
 
 const Wrapper = styled.div`
   display: flex;
@@ -44,15 +50,51 @@ const Toolbar = styled.div`
 function App() {
   const [editable, setEditable] = useState(false);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const [elements, setElements] = useState(initialElements);
+  const [currentNodes, setCurrentNodes] = useState(null);
+
+  const _initialItem = flowArrFactory(intentData, actionData)(scenarioData.steps);
+  const [elements, setElements] = useState(_initialItem);
 
   const onLoad = (rf) => {
     setReactFlowInstance(rf);
   };
 
+  const onClick = (e, elements) => {
+    handleMenu(e, elements);
+  };
+
+  const handleDeleteClick = () => {
+    const edges = elements.filter(e => isEdge(e));
+    const connectedEdges = getConnectedEdges(currentNodes, edges);
+    const elementsToRemove = [...currentNodes, ...connectedEdges];
+    setElements((els) => removeElements(elementsToRemove, els));
+  }
+
+  const onConnect = (params) => setElements((els) => addEdge({ ...params, ...nodeConfig.edge.action }, els));
+
+  const onElementsRemove = (elementsToRemove) =>
+    setElements((els) => removeElements(elementsToRemove, els));
+
   const handleDragEnd = (objInfo) => (e) => {
     const position = reactFlowInstance.project({ x: e.clientX, y: e.clientY });
-    setElements(elements.concat({ ...objInfo, position: position }))
+    setElements(elements.concat({ ...objInfo, position: position, id: 'node_' + _.uuid() }))
+  }
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenu = (event, elements) => {
+    setAnchorEl(event.target);
+    setCurrentNodes(elements);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+    setCurrentNodes(null);
+  };
+
+  const handleOpenSetting = () => {
+    console.log('open node ')
   }
 
   // reqeustAnimationFrame을 사용해 css 적용된 후 바로 한 프레임 뒤에서 fitView 실행
@@ -68,11 +110,32 @@ function App() {
   return (
     <Wrapper>
       <LeftDiv>
-        <Test initialElements={elements} onLoad={onLoad} editable={editable}></Test>
+        <ReactFlow
+          elementsSelectable={editable}
+          nodesConnectable={editable}
+          nodesDraggable={editable}
+          elements={elements}
+          onElementsRemove={onElementsRemove}
+          onConnect={onConnect}
+          onLoad={onLoad}
+          selectNodesOnDrag={false}
+          onElementClick={editable ? onClick : null}
+          snapToGrid
+          snapGrid={[100, 100]}>
+          <Background gap={11} />
+        </ReactFlow>
       </LeftDiv>
       <RightDiv editable={editable}>
-        <SideBar rightObj={rightObj} handleDragEnd={handleDragEnd} />
+        <SideBar actionData={actionData} intentData={intentData} handleDragEnd={handleDragEnd} />
       </RightDiv>
+      <NodeMenu
+        setAnchorEl={setAnchorEl}
+        anchorEl={anchorEl}
+        handleDeleteClick={handleDeleteClick}
+        handleMenu={handleMenu}
+        handleclose={handleClose}
+        handleOpenSetting={handleOpenSetting}
+        open={open} />
       <Toolbar>
         <Typography component="div">
           <Grid component="label" container alignItems="center" spacing={1}>
@@ -144,7 +207,7 @@ const initialElements = [
   {
     id: '1',
     type: 'input',
-    category:'start',
+    category: 'start',
     className: 'dark-node',
     data: { label: 'start_intetn' },
     position: { x: 0, y: 80 },
@@ -156,7 +219,7 @@ const initialElements = [
   {
     id: '2',
     className: 'dark-node',
-    category:'intent',
+    category: 'intent',
     data: { label: 'Intent' },
     position: { x: 0, y: 180 },
     style: {
@@ -166,7 +229,7 @@ const initialElements = [
   },
   {
     id: '3',
-    category:'action',
+    category: 'action',
     className: 'dark-node',
     data: { label: 'Action' },
     position: { x: 0, y: 280 },
@@ -178,7 +241,7 @@ const initialElements = [
   {
     id: '4',
     type: 'output',
-    category:'end',
+    category: 'end',
     className: 'dark-node',
     data: { label: 'end_action' },
     position: { x: 0, y: 380 },

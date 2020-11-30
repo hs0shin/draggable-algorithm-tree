@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { setSideActionArr, setSideIntentArr } from '../scenario';
 
 const BoxDiv = styled.div`
     box-shadow: 0 0.1rem 0.4rem 0.1rem rgba(0,0,0,0.08);
@@ -41,21 +42,21 @@ const ContainerDiv = styled.div`
 
 `;
 
-export default function SideBar({ rightObj, handleDragEnd }) {
+export default function SideBar({ actionData, intentData, handleDragEnd }) {
     return <>
         <LabelDiv>Intent</LabelDiv>
         <ContainerDiv>
-            {rightObj.filter(val => val.type === 'input').map(val => <BoxDiv
+            {setSideIntentArr(intentData).map(val => <BoxDiv
                 draggable
                 onDragEnd={handleDragEnd(val)}
-            >{val.id}</BoxDiv>)}
+            >{val.data.label}</BoxDiv>)}
         </ContainerDiv>
         <LabelDiv>Action</LabelDiv>
         <ContainerDiv>
-            {rightObj.filter(val => val.type === 'output').map(val => <BoxDiv
+            {setSideActionArr(actionData).map(val => <BoxDiv
                 draggable
                 onDragEnd={handleDragEnd(val)}
-            >{val.id}</BoxDiv>)}
+            >{val.data.label}</BoxDiv>)}
         </ContainerDiv>
     </>
 }
