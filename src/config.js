@@ -6,14 +6,14 @@ export const nodeConfig = {
     },
     node: {
         action: {
-            category:'action',
+            type: 'default',
             style: {
                 color: '#ff0072',
                 border: '1px solid #ff0072',
             }
         },
         intent: {
-            category:'intent',
+            type: 'default',
             style: {
                 color: '#0041d0',
                 border: '1px solid #0041d0',
@@ -21,7 +21,6 @@ export const nodeConfig = {
         },
         start: {
             type: 'input',
-            category:'start',
             style: {
                 background: 'rgb(225,225,255)',
                 color: '#0041d0',
@@ -29,7 +28,6 @@ export const nodeConfig = {
         },
         end: {
             type: 'output',
-            category:'end',
             style: {
                 background: 'rgb(255,225,225)',
                 color: '#ff0072',

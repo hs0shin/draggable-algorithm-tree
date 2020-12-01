@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import SideBar from './components/SideBar';
 import Switch from '@material-ui/core/Switch';
@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
 import { actionData, intentData, scenarioData } from './config';
-import { flowArrFactory } from './scenario';
+import { flowArrFactory, toggleNodeType } from './scenario';
 import ReactFlow, { addEdge, Background, removeElements, isEdge, getConnectedEdges } from 'react-flow-renderer';
 import NodeMenu from './components/NodeMenu';
 import { nodeConfig } from './config';
@@ -21,8 +21,11 @@ const Wrapper = styled.div`
 
 const LeftDiv = styled.div`
   height: 100%;
+  position: relative;
   width : ${props => props.editable ? '80%' : '100%'};
   background-color: rgb(250,250,250);
+  border: 3px solid black;
+  border-radius: 20px;
 `;
 
 const RightDiv = styled.div`
@@ -31,9 +34,12 @@ const RightDiv = styled.div`
   background-color: rgb(240,240,240);
   display: flex;
   flex-direction: column;
+  border: 3px solid black;
+  border-radius: 20px;
+  overflow: hidden;
 `;
 
-const Toolbar = styled.div`
+const EditBar = styled.div`
   position: absolute;
   width : 12rem;
   height : 3rem;
@@ -47,12 +53,28 @@ const Toolbar = styled.div`
   z-index: 100;
 `;
 
+const ButtonsContainer = styled.div`
+  position: absolute;
+  width : 12rem;
+  height : 3rem;
+  border-radius: 3rem;
+  background-color: rgb(240,240,240);
+  right: 1rem;
+  top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+`;
+
+const noop = (e) => e.preventDefault(); 
 function App() {
   const [editable, setEditable] = useState(false);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [currentNodes, setCurrentNodes] = useState(null);
+  const [nodeInfo, setNodeInfo] = useState(null);
 
-  const _initialItem = flowArrFactory(intentData, actionData)(scenarioData.steps);
+  const _initialItem = useCallback(() => flowArrFactory(intentData, actionData)(scenarioData.steps), []);
   const [elements, setElements] = useState(_initialItem);
 
   const onLoad = (rf) => {
@@ -68,6 +90,7 @@ function App() {
     const connectedEdges = getConnectedEdges(currentNodes, edges);
     const elementsToRemove = [...currentNodes, ...connectedEdges];
     setElements((els) => removeElements(elementsToRemove, els));
+    setAnchorEl(null);
   }
 
   const onConnect = (params) => setElements((els) => addEdge({ ...params, ...nodeConfig.edge.action }, els));
@@ -85,7 +108,8 @@ function App() {
 
   const handleMenu = (event, elements) => {
     setAnchorEl(event.target);
-    setCurrentNodes(elements);
+    setCurrentNodes(Array.isArray(elements) ? elements : [elements]);
+    setNodeInfo(Array.isArray(elements) ? null : elements);
   };
 
   const handleClose = () => {
@@ -94,9 +118,28 @@ function App() {
   };
 
   const handleOpenSetting = () => {
-    console.log('open node ')
+    console.log('open node ');
+    setAnchorEl(null);
   }
 
+  const handleInit = () => {
+    setElements(_initialItem);
+    requestAnimationFrame(
+      () => requestAnimationFrame(
+        () => reactFlowInstance.fitView()
+      )
+    );
+  }
+
+  const handleSave = () => {
+
+  };
+
+  const setNodeType = () => {
+    setElements(elements.map(el => el.id === nodeInfo.id ? toggleNodeType(el) : el));
+    handleClose();
+  };
+  
   // reqeustAnimationFrame을 사용해 css 적용된 후 바로 한 프레임 뒤에서 fitView 실행
   useEffect(
     () => reactFlowInstance && requestAnimationFrame(
@@ -109,7 +152,22 @@ function App() {
 
   return (
     <Wrapper>
-      <LeftDiv>
+      <LeftDiv onDrop={noop} onDragOver={noop}>
+        <ButtonsContainer>
+          <button>save</button>
+          <button onClick={handleInit}>init</button>
+        </ButtonsContainer>
+        <EditBar>
+          <Typography component="div">
+            <Grid component="label" container alignItems="center" spacing={1}>
+              <Grid item>View</Grid>
+              <Grid item>
+                <Switch color='primary' checked={editable} onChange={() => setEditable(!editable)} name="checkedC" />
+              </Grid>
+              <Grid item>Edit</Grid>
+            </Grid>
+          </Typography>
+        </EditBar>
         <ReactFlow
           elementsSelectable={editable}
           nodesConnectable={editable}
@@ -129,24 +187,14 @@ function App() {
         <SideBar actionData={actionData} intentData={intentData} handleDragEnd={handleDragEnd} />
       </RightDiv>
       <NodeMenu
-        setAnchorEl={setAnchorEl}
+        nodeType={nodeInfo ? nodeInfo.type : null}
+        category={(nodeInfo && nodeInfo.data) ? nodeInfo.data.category : null}
+        setNodeType={setNodeType}
         anchorEl={anchorEl}
         handleDeleteClick={handleDeleteClick}
-        handleMenu={handleMenu}
-        handleclose={handleClose}
+        handleClose={handleClose}
         handleOpenSetting={handleOpenSetting}
         open={open} />
-      <Toolbar>
-        <Typography component="div">
-          <Grid component="label" container alignItems="center" spacing={1}>
-            <Grid item>View</Grid>
-            <Grid item>
-              <Switch color='primary' checked={editable} onChange={() => setEditable(!editable)} name="checkedC" />
-            </Grid>
-            <Grid item>Edit</Grid>
-          </Grid>
-        </Typography>
-      </Toolbar>
     </Wrapper>
   );
 }

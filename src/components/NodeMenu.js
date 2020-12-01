@@ -2,8 +2,15 @@ import React, { useState } from 'react';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 
-export default function NodeMenu({ handleOpenSetting, handleDeleteClick, anchorEl, open, setAnchorEl, handleMenu, handleClose }) {
+export default function NodeMenu({ nodeType, category, setNodeType, handleOpenSetting, handleDeleteClick, anchorEl, open, handleClose }) {
 
+    const label = category ? (nodeType === 'default'
+        ? category === 'intent'
+            ? 'Start Node'
+            : 'End Node'
+        : category === 'intent'
+            ? 'Intent Node'
+            : 'End Node') : null;
     return (
         <Menu
             id="menu-appbar"
@@ -20,8 +27,9 @@ export default function NodeMenu({ handleOpenSetting, handleDeleteClick, anchorE
             open={open}
             onClose={handleClose}
         >
-            <MenuItem onClick={(e) => handleOpenSetting(e)}>Open Settings</MenuItem>
-            <MenuItem onClick={() => handleDeleteClick()} style={{ color: 'red' }}>Delete</MenuItem>
+            <MenuItem >Open Settings (To be supported)</MenuItem>
+            {label && <MenuItem onClick={setNodeType}>{`Toggle to ${label}`}</MenuItem>}
+            <MenuItem onClick={handleDeleteClick} style={{ color: 'red' }}>Delete</MenuItem>
         </Menu>
     )
 }

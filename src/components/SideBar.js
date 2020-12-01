@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { setSideActionArr, setSideIntentArr } from '../scenario';
+import TextField from '@material-ui/core/TextField';
 
 const BoxDiv = styled.div`
     box-shadow: 0 0.1rem 0.4rem 0.1rem rgba(0,0,0,0.08);
@@ -29,7 +30,7 @@ const LabelDiv = styled.div`
 
 const ContainerDiv = styled.div`  
     width: 100%;
-    height: calc(50% - 2rem);
+    height: calc(50% - 3rem);
     overflow: auto;
     display: flex;
     flex-direction: column;
@@ -43,20 +44,27 @@ const ContainerDiv = styled.div`
 `;
 
 export default function SideBar({ actionData, intentData, handleDragEnd }) {
+    const [keyWord, setKeyWord] = useState('');
+
     return <>
+        <TextField label="Search field" type="search" value={keyWord} onChange={(e) => setKeyWord(e.target.value)} />
         <LabelDiv>Intent</LabelDiv>
         <ContainerDiv>
-            {setSideIntentArr(intentData).map(val => <BoxDiv
-                draggable
-                onDragEnd={handleDragEnd(val)}
-            >{val.data.label}</BoxDiv>)}
+            {setSideIntentArr(intentData)
+                .filter(val => val.data.label.includes(keyWord))
+                .map(val => <BoxDiv
+                    draggable
+                    onDragEnd={handleDragEnd(val)}
+                >{val.data.label}</BoxDiv>)}
         </ContainerDiv>
         <LabelDiv>Action</LabelDiv>
         <ContainerDiv>
-            {setSideActionArr(actionData).map(val => <BoxDiv
-                draggable
-                onDragEnd={handleDragEnd(val)}
-            >{val.data.label}</BoxDiv>)}
+            {setSideActionArr(actionData)
+                .filter(val => val.data.label.includes(keyWord))
+                .map(val => <BoxDiv
+                    draggable
+                    onDragEnd={handleDragEnd(val)}
+                >{val.data.label}</BoxDiv>)}
         </ContainerDiv>
     </>
 }
