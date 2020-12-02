@@ -8,6 +8,7 @@ export const nodeConfig = {
         action: {
             type: 'default',
             style: {
+                background: 'rgb(250,250,250)',
                 color: '#ff0072',
                 border: '1px solid #ff0072',
             }
@@ -15,6 +16,7 @@ export const nodeConfig = {
         intent: {
             type: 'default',
             style: {
+                background: 'rgb(250,250,250)',
                 color: '#0041d0',
                 border: '1px solid #0041d0',
             }
@@ -22,14 +24,14 @@ export const nodeConfig = {
         start: {
             type: 'input',
             style: {
-                background: 'rgb(225,225,255)',
+                background: 'radial-gradient(circle, rgba(255,255,255,1) 45%, rgba(225,225,255,1) 100%)',
                 color: '#0041d0',
             }
         },
         end: {
             type: 'output',
             style: {
-                background: 'rgb(255,225,225)',
+                background: 'radial-gradient(circle, rgba(255,255,255,1) 45%, rgba(255,225,225,1) 100%)',
                 color: '#ff0072',
             }
         },

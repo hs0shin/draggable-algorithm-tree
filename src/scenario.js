@@ -1,4 +1,5 @@
 import { nodeConfig } from './config';
+import uniqueId from 'lodash.uniqueid';
 
 export const flowArrFactory = (intentArr, actionArr) => (data = []) => {
     const result = [];
@@ -93,23 +94,45 @@ const setEndObj = (result, actionArr, stepObj) => {
 export const setSideIntentArr = intentArr => {
     return intentArr.map(intentObj => ({
         ...nodeConfig.node.intent,
-        data: { label: intentObj.name, description: intentObj.description, intent_id: intentObj.id },
+        data: { label: intentObj.name, description: intentObj.description, intent_id: intentObj.id, category: 'intent' },
     }))
 };
 
 export const setSideActionArr = actionArr => {
     return actionArr.map(actionObj => ({
         ...nodeConfig.node.action,
-        data: { label: actionObj.name, description: actionObj.description, action_id: actionObj.id },
+        data: { label: actionObj.name, description: actionObj.description, action_id: actionObj.id, category: 'action' },
     }))
 };
 
 export const toggleNodeType = (node) => {
     const newNode = { ...node };
-    if (node.type === 'default') {
-        if (node.data.category === 'intent') newNode.type = 'input';
-        else if (node.data.category === 'action') newNode.type = 'output';
-    } else if (node.type === 'input' || node.type === 'output') newNode.type = 'default';
+    switch (node.type) {
+        case 'default': switch (node.data.category) {
+            case 'intent':
+                newNode.style = nodeConfig.node.start.style;
+                newNode.type = 'input';
+                newNode.data.category = 'start';
+                break;
+            case 'action':
+                newNode.style = nodeConfig.node.end.style;
+                newNode.type = 'output';
+                newNode.data.category = 'end';
+                break;
+            default: throw Error(`Type of this category is not valid. Category : ${node.data.categroy}`);
+        } break;
+        case 'input':
+            newNode.style = nodeConfig.node.intent.style;
+            newNode.type = 'default';
+            newNode.data.category = 'intent';
+            break;
+        case 'output':
+            newNode.style = nodeConfig.node.action.style;
+            newNode.type = 'default';
+            newNode.data.category = 'action';
+            break;
+        default: throw Error(`Type of this node is not valid. Type : ${node.type}`);
+    }
     return newNode;
 };
 
@@ -118,7 +141,7 @@ export const validate = (elements, nodes, edges) => {
     if (!checkAllNodeLink(nodes, edges)) return false;
     if (!checkNoDoubleLinkedIntent(nodes, edges)) return false;
     if (!checkSingleStartNode(nodes)) return false;
-    if (!checkIncompletedRoute(elements)) return false;
+    if (!checkIncompletedRoute(nodes, edges)) return false;
     return true;
 };
 
@@ -139,7 +162,7 @@ const checkNoDoubleLinkedIntent = (nodes, edges) => {
     for (let edge of edges) {
         const tC = nodeMap.get(edge.target);
         const sC = nodeMap.get(edge.source);
-        if ((tC === 'start' || tC === 'intent') && (sC === 'start' || tC === 'intent')) return false;
+        if ((tC === 'start' || tC === 'intent') && (sC === 'start' || sC === 'intent')) return false;
     }
     return true;
 }
@@ -148,13 +171,68 @@ const checkSingleStartNode = (nodes) => {
     let num = 0;
     for (let node of nodes) {
         if (node.data.category === 'start') ++num;
-        if (num > 1) return false;
     }
-    return true;
+    return num === 1 ? true : false;
 }
 
-export const parseToDataBaseObj = (elements) => {
+const checkIncompletedRoute = (nodes, edges) => {
+    const noEndNodeSet = new Set(nodes
+        .filter(node => node.data.category !== 'end')
+        .map(node => node.id));
 
+    for (let edge of edges) {
+        noEndNodeSet.delete(edge.source);
+    }
+    return noEndNodeSet.size === 0 ? true : false;
+}
+
+export const parseToDatabaseObj = (nodes, edges, scenarioName, updateFlag, superiorId) => {
+    const result = {
+        name: scenarioName,
+        steps: [],
+    };
+    updateFlag ? result.id = superiorId : result.bot_id = superiorId;
+    for (let node of nodes) {
+        const obj = {
+            x_coordinate: node.position.x,
+            y_coordinate: node.position.y,
+            type: setObjType(node.data.category),
+            intent_id: node.data.intent_id || null,
+            action_id: node.data.action_id || null,
+            next_steps: [],
+            step_index: node.id
+        }
+        edges
+            .filter(edge => edge.source === node.id)
+            .forEach(edge => obj.next_steps.push({
+                step_index: edge.target,
+                condition_flag: 0
+            }));
+        result.steps.push(obj);
+    }
+
+    return setStepIndexes(result);
+}
+
+const setStepIndexes = (result) => {
+    const idMap = new Map(result.steps.map(step => [step.step_index, uniqueId('') * 1]));
+    for (let step of result.steps) {
+        step.step_index = idMap.get(step.step_index);
+        for (let next of step.next_steps) {
+            next.step_index = idMap.get(next.step_index);
+        }
+    }
+    return result;
+}
+
+const setObjType = (type) => {
+    switch (type) {
+        case 'intent': return 0;
+        case 'action': return 1;
+        case 'start': return 2;
+        case 'end': return 3;
+        default: throw Error(`Invalid Type : ${type}`);
+    }
 }
 
 let action = {

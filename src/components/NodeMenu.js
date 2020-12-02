@@ -4,13 +4,15 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 export default function NodeMenu({ nodeType, category, setNodeType, handleOpenSetting, handleDeleteClick, anchorEl, open, handleClose }) {
 
-    const label = category ? (nodeType === 'default'
-        ? category === 'intent'
-            ? 'Start Node'
-            : 'End Node'
-        : category === 'intent'
-            ? 'Intent Node'
-            : 'End Node') : null;
+    const label = category
+        ? nodeType === 'default'
+            ? category === 'intent'
+                ? 'Start Node'
+                : 'End Node'
+            : nodeType === 'input'
+                ? 'Intent Node'
+                : 'Action Node'
+        : null;
     return (
         <Menu
             id="menu-appbar"

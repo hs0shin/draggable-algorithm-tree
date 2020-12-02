@@ -7,8 +7,8 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
 import { actionData, intentData, scenarioData } from './config';
-import { flowArrFactory, toggleNodeType } from './scenario';
-import ReactFlow, { addEdge, Background, removeElements, isEdge, getConnectedEdges } from 'react-flow-renderer';
+import { flowArrFactory, parseToDatabaseObj, toggleNodeType, validate } from './scenario';
+import ReactFlow, { addEdge, Background, removeElements, isEdge, getConnectedEdges, isNode } from 'react-flow-renderer';
 import NodeMenu from './components/NodeMenu';
 import { nodeConfig } from './config';
 import _ from 'lodash-uuid';
@@ -67,7 +67,7 @@ const ButtonsContainer = styled.div`
   z-index: 100;
 `;
 
-const noop = (e) => e.preventDefault(); 
+const noop = (e) => e.preventDefault();
 function App() {
   const [editable, setEditable] = useState(false);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
@@ -132,14 +132,17 @@ function App() {
   }
 
   const handleSave = () => {
-
+    const nodes = elements.filter(el => isNode(el));
+    const edges = elements.filter(el => isEdge(el));
+    const databaseObj = validate(elements, nodes, edges) && parseToDatabaseObj(nodes, edges, 'test', false, 22);
+    console.log(databaseObj);
   };
 
   const setNodeType = () => {
     setElements(elements.map(el => el.id === nodeInfo.id ? toggleNodeType(el) : el));
     handleClose();
   };
-  
+
   // reqeustAnimationFrame을 사용해 css 적용된 후 바로 한 프레임 뒤에서 fitView 실행
   useEffect(
     () => reactFlowInstance && requestAnimationFrame(
@@ -154,7 +157,7 @@ function App() {
     <Wrapper>
       <LeftDiv onDrop={noop} onDragOver={noop}>
         <ButtonsContainer>
-          <button>save</button>
+          <button onClick={handleSave}>save</button>
           <button onClick={handleInit}>init</button>
         </ButtonsContainer>
         <EditBar>
@@ -169,7 +172,7 @@ function App() {
           </Typography>
         </EditBar>
         <ReactFlow
-          elementsSelectable={editable}
+          elementsSelectable={false}
           nodesConnectable={editable}
           nodesDraggable={editable}
           elements={elements}
