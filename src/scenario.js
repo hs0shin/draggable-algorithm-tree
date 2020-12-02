@@ -137,7 +137,7 @@ export const toggleNodeType = (node) => {
 };
 
 
-export const validate = (elements, nodes, edges) => {
+export const validate = (nodes, edges) => {
     if (!checkAllNodeLink(nodes, edges)) return false;
     if (!checkNoDoubleLinkedIntent(nodes, edges)) return false;
     if (!checkSingleStartNode(nodes)) return false;

@@ -134,7 +134,7 @@ function App() {
   const handleSave = () => {
     const nodes = elements.filter(el => isNode(el));
     const edges = elements.filter(el => isEdge(el));
-    const databaseObj = validate(elements, nodes, edges) && parseToDatabaseObj(nodes, edges, 'test', false, 22);
+    const databaseObj = validate(nodes, edges) && parseToDatabaseObj(nodes, edges, 'test', false, 22);
     console.log(databaseObj);
   };
 
